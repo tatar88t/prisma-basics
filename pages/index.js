@@ -1,8 +1,30 @@
 import Head from 'next/head'
 import Image from 'next/image'
+import { useState } from 'react';
 import styles from '../styles/Home.module.css'
+// import { PrismaClient } from "@prisma/client";
 
-export default function Home() {
+// const prisma = new PrismaClient();
+
+export default function Home(props) {
+
+    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
+
+    const save = async (e) => {
+      e.preventDefault();
+
+      const body = JSON.stringify({username, email});
+
+      const res = await fetch('http://localhost:3000/api/user', {
+        method: 'POST',
+        mode: 'no-cors',
+        body
+      });
+
+      const data = await res.json();
+      console.log(data, 'data----');
+    }
   return (
     <div className={styles.container}>
       <Head>
@@ -12,44 +34,17 @@ export default function Home() {
       </Head>
 
       <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
+       <div>
+        {props.data.name}
+       </div>
 
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h2>Documentation &rarr;</h2>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h2>Learn &rarr;</h2>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h2>Examples &rarr;</h2>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h2>Deploy &rarr;</h2>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
+       <form>
+          <input value={username} onChange={(e) => setUsername(e.target.value)}/>
+          <input value={email} onChange={(e) => setEmail(e.target.value)} />
+          <button onClick={save}>
+            Save
+          </button>
+       </form>
       </main>
 
       <footer className={styles.footer}>
@@ -66,4 +61,14 @@ export default function Home() {
       </footer>
     </div>
   )
+}
+
+
+export async function getServerSideProps(context){
+  const res = await fetch(`http://localhost:3000/api/hello`);
+  const data = await res.json();
+
+  return {
+    props: {data}
+  }
 }
